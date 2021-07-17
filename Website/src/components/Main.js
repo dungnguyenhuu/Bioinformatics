@@ -8,8 +8,8 @@ function ResultComponent(props) {
   return (<table>
     <thead>
       <tr>
-        <td style={{ fontWeight: 'bold' }}>ID</td>
-        <td style={{ fontWeight: 'bold' }}>Kết quả</td>
+        <th style={{ fontWeight: 'bold' }}>ID</th>
+        <th style={{ fontWeight: 'bold' }}>Kết quả</th>
       </tr>
     </thead>
     <tbody>
@@ -30,6 +30,7 @@ class Main extends Component {
       file: null,
       predictingAcr: '',
       showingResults: false,
+      textInfo: ''
     };
 
     this.documentInput = React.createRef();
@@ -55,9 +56,16 @@ class Main extends Component {
         response.data.status === 'SUCCESS'
       ) {
         const results = response?.data?.data ?? [];
+        const count = results.length;
+        let countAcr = 0;
+        for (const r of results) {
+          if (r[1] === '1') countAcr++;
+        }
+
         this.setState({
           showingResults: true,
-          predictingAcr: results
+          textInfo: `Total: ${count} protein, ${countAcr} positive & ${count - countAcr} negative`,
+          predictingAcr: results,
         });
       }
     } else {
@@ -66,16 +74,19 @@ class Main extends Component {
   }
 
   onChangeFile = (e) => {
-    const fr = new FileReader();
-    const me = this;
-    fr.onload = function () {
-      me.setState({ content: fr.result });
-    }
-    fr.readAsText(e.target.files[0]);
+    if (e.target.files[0]) {
+      const fr = new FileReader();
+      const me = this;
+      fr.onload = function () {
+        me.setState({ content: fr.result });
+      }
+      fr.readAsText(e.target.files[0]);
 
-    this.setState({
-      file: e.target.files[0]
-    })
+      this.setState({
+        file: e.target.files[0]
+      })
+    }
+
   }
 
   changeContent = (e) => {
@@ -123,18 +134,18 @@ class Main extends Component {
 
         {this.state.showingResults && (
           <section className="results-section">
+            <h3>{this.state.textInfo}</h3>
+            <br/>
             <div className="results">
-              <div>
-                <ResultComponent results={this.state.predictingAcr} />
-              </div>
-              <button className="button" onClick={this.resetFile}>
+              <ResultComponent results={this.state.predictingAcr} />
+              <button className="button" style={{ position: 'relative', marginTop: '9rem' }} onClick={this.resetFile}>
                 <i className="fas fa-redo"></i>&nbsp;&nbsp;Thử lại với file
                 khác
               </button>
             </div>
           </section>
         )}
-{/* 
+        {/* 
         <section className="samples-section">
           <h3 className="samples-section__title">File mẫu</h3>
 

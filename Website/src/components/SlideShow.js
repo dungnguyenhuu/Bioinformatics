@@ -35,29 +35,18 @@ class SlideShow extends Component {
       <section className="jumbotron">
         <div className="jumbotron__content">
           <div className={classAnim }>
-            <h2>Nhập môn học máy và khai phá dữ liệu </h2>
-            <h2>Nhóm 17</h2>
+            <h2>Bioinformatic project</h2>
+            {/* <h2>Nhóm 21</h2> */}
           </div>
           <div className="animated infinite fadeInUp">
             <p className="jumbotron__lead">
-              Phân loại nội dung trang web trực tuyến
+              Dự đoán Anti CRISPR Protein
             </p>
           </div>
-          {/* <div className="animated infinite fadeInUp">
-            <p className="jumbotron__description">
-              Phân loại văn bản là việc sắp xếp các văn bản vào các danh mục tương
-              ứng với chúng như thể thao, giải trí, xã hội,... như các trang báo
-              điện tử thường làm. Việc này có thể được thực hiện thủ công bởi các
-              biên tập viên tuy nhiên đòi hỏi phải tiêu tốn nhiều thời gian và
-              công sức. <strong>TextClassifier</strong> là giải pháp
-              giúp tự động phân loại văn bản tiếng Việt một cách nhanh chóng và
-              hiệu quả.
-            </p>
-          </div> */}
           <div className="animated infinite zoomIn">
-            <Link to="/gioi-thieu" className="button button-outlined">
+            {/* <Link to="/gioi-thieu" className="button button-outlined">
               Tìm hiểu thêm
-            </Link>
+            </Link> */}
           </div>
         </div>
         

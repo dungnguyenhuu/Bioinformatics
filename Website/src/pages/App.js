@@ -8,8 +8,7 @@ class App extends Component {
   render() {
     return (
       <Layout>
-        {/* <SlideShow /> */}
-
+        <SlideShow />
         <div className="wrapper">
           <Main />
         </div>

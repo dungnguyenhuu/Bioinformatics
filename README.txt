@@ -1,6 +1,6 @@
-A machine learning system developed in python that ranks proteins in a proteome as per their Anti-CRISPR tendencies predicted using sequence features.
+A machine learning system developed in python helps predict whether 1 protein in a proteome will follow their Anti-CRISPR trends predicted using sequence features.
 
-The method takes as input a proteome in FASTA format and returns a ranked list as per the expected Acr behavior in csv format.
+This method takes as input a proteome in FASTA format and returns a list of expected Acrs in csv format.
 Training model,
 python train.py
 
@@ -11,8 +11,21 @@ For example,
 cd API
 python arguments.py data/sequence.fasta data/results
 
+For Web-Server,
+    Front-end(reactjs): 
+        cd Website
+        npm install
+        npm start
+    Back-end(flask-python):
+        cd API
+        python api.py
+Environment
+    Window 10, Python 3
+
 Following packages are required:
 Biopython
 sklearn
 scipy
+Flask
+flask_cors
 

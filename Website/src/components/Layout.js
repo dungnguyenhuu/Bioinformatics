@@ -51,11 +51,11 @@ class Layout extends Component {
 
     return (
       <Fragment>
-        <Header />
+        {/* <Header /> */}
 
         <div style={{ minHeight: '71.5vh' }}>{children}</div>
 
-        <Footer />
+        {/* <Footer /> */}
       </Fragment>
     );
   }

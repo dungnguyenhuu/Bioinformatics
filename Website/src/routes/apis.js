@@ -5,7 +5,8 @@ const baseAPICallAPI = baseAPI + '/api-calls';
 const baseStatisticsAPI = baseAPI + '/statistics';
 const baseTokensAPI = baseAPI + '/tokens';
 const baseDemonstrationAPI = baseAPI + '/demonstrate';
-
+const baseAcrAPI = baseAPI + '/predict-acr';
+const baseAcrContentAPI = baseAPI + '/predict-acr-content';
 export default {
   users: {
     register: baseUserAPI + '/register',
@@ -43,4 +44,6 @@ export default {
     validate: baseTokensAPI + '/validate',
   },
   demonstrate: baseDemonstrationAPI,
+  acr: baseAcrAPI,
+  acrContent: baseAcrContentAPI,
 };

@@ -7,10 +7,13 @@ from flask_sqlalchemy import SQLAlchemy
 import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
+import json
 import datetime
 from functools import wraps
 from flask_cors import CORS, cross_origin
 from vietnamese_text_classifier import predict_category
+from preprocessing import *
+from werkzeug.utils import secure_filename
 
 # Constants
 THIS_WEEK = 1
@@ -25,7 +28,8 @@ cors = CORS(app)
 app.config['SECRET_KEY'] = 'thisissecret'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////vtc.db'
 app.config['CORS_HEADERS'] = 'Content-Type'
-
+app.config['UPLOAD_FOLDER'] = 'upload'
+ALLOWED_EXTENSIONS = {'fasta'}
 db = SQLAlchemy(app)
 
 # Models
@@ -868,6 +872,42 @@ def demonstrate():
         'data': data
     })
 
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/api/predict-acr', methods=['POST'])
+def predictAcr():
+    f = request.files['file']
+    if f.filename == "":
+        return jsonify({
+            'status': 'ERROR',
+        })
+    if not allowed_file(f.filename):
+        return jsonify({
+            'status': 'ERROR',
+        })
+    else:
+        full_filename = secure_filename(f.filename)
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], full_filename))
+        f.seek(0)
+        #print("File saved")
+        content = f.read()
+        content = str(content, 'utf-8')
+        results = analyzePhage_1(os.path.join(
+            app.config['UPLOAD_FOLDER'], full_filename))
+        jsonText = json.dumps(results)
+        return jsonify({'data': results, 'status': 'SUCCESS', 'content': content})
+
+@app.route('/api/predict-acr-content', methods=['POST'])
+def predictAcrContent():
+    data = request.get_json()
+    content = data['content']
+    results = analyzePhageContent(content)
+    jsonText = json.dumps(results)
+    return jsonify({'data': results, 'status': 'SUCCESS'})
 
 @app.route('/api/predict', methods=['POST'])
 def create_api_call():

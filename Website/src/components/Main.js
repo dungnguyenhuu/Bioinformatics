@@ -1,7 +1,26 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import Sample from './Sample';
 import axios from 'axios';
 import apiRoutes from '../routes/apis';
+
+function ResultComponent(props) {
+  const [results, setResults] = useState([]);
+
+  return (<table>
+    <thead>
+      <tr>
+        <td style={{ fontWeight: 'bold' }}>ID</td>
+        <td style={{ fontWeight: 'bold' }}>Kết quả</td>
+      </tr>
+    </thead>
+    <tbody>
+      {props.results.map(item => <tr key={item[0]}>
+        <td>{item[0]}</td>
+        <td>{item[1]}</td>
+      </tr>)}
+    </tbody>
+  </table>);
+}
 
 class Main extends Component {
   constructor(props) {
@@ -56,40 +75,82 @@ class Main extends Component {
           source: 'https://www.tienphong.vn',
         },
       ],
-      document: '',
-      predictingCategory: '',
+      content: '',
+      file: null,
+      predictingAcr: '',
       showingResults: false,
     };
 
     this.documentInput = React.createRef();
   }
 
-  predictCategory = async (e) => {
+  predictAcr = async (e) => {
     e.preventDefault();
-
-    if (this.state.document !== '') {
-      const { demonstrate } = apiRoutes;
-      const response = await axios.post(demonstrate, {
-        document: this.state.document,
+    const file = this.state.file;
+    if (file !== null) {
+      const formData = new FormData();
+      formData.append('file', file);
+      const { acr } = apiRoutes;
+      const response = await axios.post(acr, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
       });
+      console.log(response);
 
       if (
         response &&
         response.status === 200 &&
         response.data.status === 'SUCCESS'
       ) {
-        const { data } = response.data;
-        const { predicting_category } = data;
-
+        const results = response?.data?.data ?? [];
+        let tbody = '';
+        for (let i = 0; i < results.length; i++) {
+          tbody += `
+          <tr>
+            <td>${results[i][0]}</td>
+            <td>$80</td>
+          </tr>
+          `
+        }
+        const textResult = `
+                <table>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Kết quả</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>January</td>
+                      <td>$100</td>
+                    </tr>
+                  </tbody>
+                </table>
+        `
         this.setState({
-          predictingCategory: predicting_category,
           showingResults: true,
+          predictingAcr: results
         });
       }
     } else {
-      this.documentInput.current.focus();
+      console.log('fail');
     }
-  };
+  }
+
+  onChangeFile = (e) => {
+    const fr = new FileReader();
+    const me = this;
+    fr.onload = function () {
+      me.setState({ content: fr.result });
+    }
+    fr.readAsText(e.target.files[0]);
+
+    this.setState({
+      file: e.target.files[0]
+    })
+  }
 
   selectSample = (sampleId) => {
     const index = this.state.samples.findIndex(
@@ -106,15 +167,16 @@ class Main extends Component {
     });
   };
 
-  changeDocument = (e) => {
+  changeContent = (e) => {
     this.setState({
-      document: e.target.value,
+      content: e.target.value,
     });
   };
 
-  resetDocument = () => {
+  resetFile = () => {
     this.setState({
-      document: '',
+      file: null,
+      content: '',
       showingResults: false,
     });
   };
@@ -122,51 +184,48 @@ class Main extends Component {
   render() {
     return (
       <main>
-        {!this.state.showingResults && (
+        {
           <section className="input-section">
-            <h3 className="input-section__title">Nội dung văn bản</h3>
-            <form onSubmit={this.predictCategory}>
+            <h3 className="input-section__title">Chọn file định dạng fasta</h3>
+            <form id="form-upload" onSubmit={this.predictAcr} encType="multipart/form-data">
+              <input type="file" id="input-file" name="input_file" onChange={this.onChangeFile}></input>
               <textarea
-                placeholder="Nhập nội dung văn bản cần phân loại"
+                placeholder="Nội dung file"
                 rows={15}
                 resizable="false"
-                value={this.state.document}
-                onChange={this.changeDocument}
+                disabled
+                value={this.state.content}
+                onChange={this.changeContent}
                 ref={this.documentInput}
               ></textarea>
-
-              <button
-                type="submit"
-                className="button"
-                style={{ width: '100%' }}
-              >
-                Phân loại văn bản
-              </button>
+              {!this.state.showingResults &&
+                <button
+                  type="submit"
+                  className="button"
+                  style={{ width: '100%' }}
+                >
+                  Dự đoán
+                </button>}
             </form>
           </section>
-        )}
+        }
 
         {this.state.showingResults && (
           <section className="results-section">
-            <h3 className="results-section__title">Kết quả phân loại</h3>
             <div className="results">
-              <p className="results__text">
-                Chủ đề được chọn cho văn bản trên là
-              </p>
-              <p className="results__keyword">
-                {this.state.predictingCategory}
-              </p>
-
-              <button className="button" onClick={this.resetDocument}>
-                <i className="fas fa-redo"></i>&nbsp;&nbsp;Thử lại với văn bản
+              <div>
+                <ResultComponent results={this.state.predictingAcr} />
+              </div>
+              <button className="button" onClick={this.resetFile}>
+                <i className="fas fa-redo"></i>&nbsp;&nbsp;Thử lại với file
                 khác
               </button>
             </div>
           </section>
         )}
-
+{/* 
         <section className="samples-section">
-          <h3 className="samples-section__title">Văn bản mẫu</h3>
+          <h3 className="samples-section__title">File mẫu</h3>
 
           <div className="samples">
             {this.state.samples.map((sample) => (
@@ -177,10 +236,12 @@ class Main extends Component {
               />
             ))}
           </div>
-        </section>
+        </section> */}
       </main>
     );
   }
 }
+
+
 
 export default Main;

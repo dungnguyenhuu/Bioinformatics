@@ -37,8 +37,10 @@ def prot_feats_seq(seq):
         dp.append(p[a])
 
     dp = np.array(dp)
+    print('dp -> ',dp)
     dp = normalize(np.atleast_2d(dp), norm='l2',
                    copy=True, axis=1, return_norm=False)
+    print('dp2 -> ',dp)
     f.extend(dp[0])
 
     tm = np.array(twomerFromSeq(str(seq)))
@@ -221,7 +223,8 @@ def threemerFromFile(filename):
 
 def analyzePhage(filename, output):
     X, ids = prot_feats(filename)
-
+    print('X -> ',X)
+    print('ids -> ',ids)
     # model=pickle.load(open('xgb.pickle', 'rb'))
     # print(model)
     # scores = model.predict(X)
